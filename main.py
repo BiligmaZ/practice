@@ -8,7 +8,7 @@ class ImageProcessorApp:
     def __init__(self, root):
         self.canvas = None
         self.root = root
-        self.root.title("Image Processing App")
+        self.root.title("Обработка изображений")
         self.image = None
         self.photo = None
         self.create_widgets()
