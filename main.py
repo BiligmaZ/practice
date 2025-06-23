@@ -5,7 +5,10 @@ from PIL import Image, ImageTk
 import cv2
 
 class ImageProcessorApp:
+    """Приложение для базовой обработки изображений с использованием OpenCV, Tkinter и PyTorch"""
+
     def __init__(self, root):
+        """Инициализация интерфейса приложения"""
         self.canvas = None
         self.root = root
         self.root.title("Обработка изображений")
@@ -14,6 +17,7 @@ class ImageProcessorApp:
         self.create_widgets()
 
     def create_widgets(self):
+        """Создание всех кнопок управления и области отображения"""
         tk.Button(self.root, text="Загрузить изображение", command=self.load_image).pack(fill='x')
         tk.Button(self.root, text="Сделать снимок с камеры", command=self.capture_image).pack(fill='x')
         tk.Button(self.root, text="Показать красный канал", command=lambda: self.show_channel(2)).pack(fill='x')
@@ -26,6 +30,7 @@ class ImageProcessorApp:
         self.canvas.pack()
 
     def show_image(self, img):
+        """Отображение изображения на экране"""
         img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         im = Image.fromarray(img_rgb)
         imgtk = ImageTk.PhotoImage(image=im)
@@ -33,6 +38,7 @@ class ImageProcessorApp:
         self.canvas.config(image=imgtk)
 
     def load_image(self):
+        """Загрузка изображения с диска с проверкой на корректность формата"""
         file_path = filedialog.askopenfilename(filetypes=[("Image files", "*.jpg *.png")])
         if not file_path:
             return
@@ -44,6 +50,7 @@ class ImageProcessorApp:
         self.show_image(self.image)
 
     def capture_image(self):
+        """Захват изображения с веб-камеры и отображение его в окне"""
         cap = cv2.VideoCapture(0)
         if not cap.isOpened():
             messagebox.showerror(
@@ -62,6 +69,7 @@ class ImageProcessorApp:
         self.show_image(self.image)
 
     def show_channel(self, channel):
+        """Отображение одного из цветовых каналов (R, G или B)"""
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
@@ -72,6 +80,9 @@ class ImageProcessorApp:
         self.show_image(img_np)
 
     def blur_image(self):
+        """Усреднение изображения с помощью фильтра размытия
+        Пользователь вводит размер ядра (только нечётные значения)
+        Применяется фильтр сглаживания (cv2.blur)"""
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
@@ -85,6 +96,7 @@ class ImageProcessorApp:
         self.show_image(blurred)
 
     def to_grayscale(self):
+        """Преобразование изображения в оттенки серого и отображение его в цветном формате для Tkinter"""
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
@@ -93,6 +105,8 @@ class ImageProcessorApp:
         self.show_image(gray_bgr)
 
     def draw_rectangle(self):
+        """Рисование синего прямоугольника по координатам, введённым пользователем
+        Проверка на корректность введённых координат (в пределах изображения)"""
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
