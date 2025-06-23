@@ -1,8 +1,8 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog
+import torch
 from PIL import Image, ImageTk
 import cv2
-import numpy as np
 
 class ImageProcessorApp:
     def __init__(self, root):
@@ -65,9 +65,11 @@ class ImageProcessorApp:
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
-        zeros = np.zeros_like(self.image)
-        zeros[:, :, channel] = self.image[:, :, channel]
-        self.show_image(zeros)
+        img_tensor = torch.from_numpy(self.image).clone()
+        zeros = torch.zeros_like(img_tensor)
+        zeros[:, :, channel] = img_tensor[:, :, channel]
+        img_np = zeros.numpy()
+        self.show_image(img_np)
 
     def blur_image(self):
         if self.image is None:
