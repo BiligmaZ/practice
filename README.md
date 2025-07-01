@@ -21,11 +21,7 @@
 ```bash
 practice\Scripts\activate
 ```
-- В Linux/macOS:
 
-```bash
-source practice/bin/activate
-```
 3. Установите зависимости:
 
 ```bash
