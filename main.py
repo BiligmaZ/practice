@@ -80,20 +80,23 @@ class ImageProcessorApp:
         self.show_image(img_np)
 
     def blur_image(self):
-        """Усреднение изображения с помощью фильтра размытия
-        Пользователь вводит размер ядра (только нечётные значения)
-        Применяется фильтр сглаживания (cv2.blur)"""
+        """Усреднение изображения с помощью фильтра размытия"""
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
-        k = simpledialog.askinteger("Размер ядра", "Введите нечетное целое число > 1:", minvalue=3)
-        if k is None:
-            return
-        if k % 2 == 0:
-            messagebox.showerror("Ошибка", "Размер ядра должен быть нечетным")
-            return
-        blurred = cv2.blur(self.image, (k, k))
-        self.show_image(blurred)
+        try:
+            k = simpledialog.askstring("Размер ядра", "Введите нечетное целое число > 1:")
+            if k is None:
+                return
+            k = int(k)
+            if k < 3:
+                raise ValueError("Размер ядра должен быть больше 1")
+            if k % 2 == 0:
+                raise ValueError("Размер ядра должен быть нечетным числом")
+            blurred = cv2.blur(self.image, (k, k))
+            self.show_image(blurred)
+        except ValueError as e:
+            messagebox.showerror("Ошибка", f"Некорректный ввод: введите целое нечетное число")
 
     def to_grayscale(self):
         """Преобразование изображения в оттенки серого и отображение его в цветном формате для Tkinter"""
@@ -105,24 +108,29 @@ class ImageProcessorApp:
         self.show_image(gray_bgr)
 
     def draw_rectangle(self):
-        """Рисование синего прямоугольника по координатам, введённым пользователем
-        Проверка на корректность введённых координат (в пределах изображения)"""
+        """Рисование синего прямоугольника по координатам с проверкой корректности ввода"""
         if self.image is None:
             messagebox.showwarning("Нет изображения", "Сначала загрузите или сделайте снимок")
             return
-        x1 = simpledialog.askinteger("X1", "Введите X1:")
-        y1 = simpledialog.askinteger("Y1", "Введите Y1:")
-        x2 = simpledialog.askinteger("X2", "Введите X2:")
-        y2 = simpledialog.askinteger("Y2", "Введите Y2:")
-        if None in (x1, y1, x2, y2):
+
+        try:
+            x1 = int(simpledialog.askstring("Координата X1", "Введите X1:"))
+            y1 = int(simpledialog.askstring("Координата Y1", "Введите Y1:"))
+            x2 = int(simpledialog.askstring("Координата X2", "Введите X2:"))
+            y2 = int(simpledialog.askstring("Координата Y2", "Введите Y2:"))
+        except (TypeError, ValueError):
+            messagebox.showerror("Ошибка", "Некорректный ввод: координаты должны быть целыми числами")
             return
-        img_copy = self.image.copy()
-        h, w = img_copy.shape[:2]
+
+        h, w = self.image.shape[:2]
         if not (0 <= x1 < w and 0 <= x2 < w and 0 <= y1 < h and 0 <= y2 < h):
-            messagebox.showerror("Ошибка", "Координаты вне изображения")
+            messagebox.showerror("Ошибка", f"Координаты должны быть в пределах изображения (ширина: {w}, высота: {h})")
             return
+
+        img_copy = self.image.copy()
         cv2.rectangle(img_copy, (x1, y1), (x2, y2), (255, 0, 0), 2)
         self.show_image(img_copy)
+
 
 if __name__ == '__main__':
     root = tk.Tk()
